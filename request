@@ -1,0 +1,53 @@
+The following listing is already programmed in Veeva CDB Workbench. ***CQL PROGRAMMING LANGUAGE. NOT SQL.***
+
+-Listing Title: Consistency between End of Trial Period Disposition status and Post End of treatment visits_1
+
+-Objective: This report lists subjects that have completed item "Next Trial Period" in DSETP form and the expected visit has not been entered.
+
+
+-Programming Guide/Notes:
+"Output is produced if for the selected "Next Trial Period" the corresponding expected visit has not been entered after X days from Date of Discontinuation of DSETP or from last dose of study medication.
+
+Expected visits:
+When Next trial Segment = Continuing into Adrenal Recovery Assessment/Efficacy Follow-up:
+Adrenal Recovery Assessment: 11-17 days after last dose (EC1) - applicable only for Arms: TRIG = 0011,0013,0015
+
+Safety Follow-Up - 30-37 days after last dose of study intervention (EC1,EC4,EC5,EC6,EC7,EC8 or EC9)
+
+Adrenal Recovery Follow-up week 4: 25-31 days after Safety Follow-up Visit (if the visit is not performed, please count from Discontinuation visit), applicable only for Arms: TRIG = 0011,0013,0015
+
+Adrenal Recovery Follow-up week 8: 53-59 days after Safety Follow-up Visit (if the visit is not performed, please count from Discontinuation visit), applicable only for Arms: TRIG = 0011,0013,0015
+
+Adrenal Recovery Follow-up week 16: 109-115 days after Safety Follow-up Visit (if the visit is not performed, please count from Discontinuation visit), applicable only for Arms: TRIG = 0011,0013,0015
+
+Adrenal Recovery Follow-up week 24: 165-171 days after Safety Follow-up Visit (if the visit is not performed, please count from Discontinuation visit), applicable only for Arms: TRIG = 0011,0013,0015
+
+Note: Ask for next Adrenal Recovery Follow-up until DSEPT2 Trial Period = Adrenal Recovery Follow-up is completed, if DSETP2 is completed, don't ask for visit that should occur after DSETP2 Date of Discontinuation"
+
+
+-Forms Used: DSETP, DSETP2, EC1, EC4, EC5, EC6, EC7, EC8, EC9, TRIG
+
+-Column for query to fire on: Date of Event
+-Query Msg: "Date of Event is equal or after End of Trial Period Disposition Date of Discontinuation. Please correct."
+
+
+My CQL Code is attached in the file (Consistency between End of Trial Period Disposition status and Post End of treatment visits_1.txt), as well as its current output. I've also attached data output for TRIG and vwECDDose view for these subjects. Please note there is no data for DSETP2 form for these subjects. 
+
+
+*For below subjects there is missing output for various visits.
+00040253
+00040254
+00040255
+00040256
+00040267
+00040268
+00040269
+00040270
+00040271
+00040272
+00040258
+00040259
+00040260
+00040261
+
+*For 00040265 - there is a safety visit entered so for this listing even if it is out of window this should not be outputed since visit is not missing, and out of window visits is covered by a version 2 of this listing.
