@@ -1,0 +1,18 @@
+I updated the code, please see my comments/findings below.
+
+Subject 00040265: 
+not present in output anymore. Safety Follow-up has a date 01/02/2026 and is not a missing visit.
+
+Subjects expected 00040270, 00040271, 00040272: 
+These three subjects do not have a Safety Follow-up event and Safety FU appears missing at the schedule level.
+
+The reason they’re excluded is becuase DSETP is filtered to: DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'. 
+00040270, 00040271, 00040272 all have Next Trial Period = SURVIVAL FOLLOW-UP. So they’ll never populate in the output for this listing.
+If this listing is only for “Continuing into Adrenal Recovery Assessment/Efficacy Follow-up” then it's not expected in output. Please Confirm.
+
+
+Currently the code output includes visits that aren’t “due yet” and seems like it inflates record count.
+
+For the rule, “output after X days when the visit still hasn’t been entered”, please confirm if the listing should only fire once the window end is in the past (relative to run date). The current output includes many future windows.
+
+Example: 00040253 shows Week 8 with Window End 02/27/2026, but it's still included in the output.
