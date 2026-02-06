@@ -1,0 +1,441 @@
+SELECT
+  a.Site AS `Site`,
+  a.Participant AS `Participant`,
+  a.Arm AS `Arm`,
+  DATE(a.ETP_Discon) AS `ETP Date of Discontinuination`,
+  a.NextTrialPeriod AS `Next Trial Period`,
+  DATE(a.LastDoseDate) AS `Last Dose Date`,
+  DATE(a.SafetyFUDate) AS `Safety Follow-Up Visit Date`,
+  a.ExpectedVisit AS `Expected Visit`,
+  DATE(a.ExpectedVisitDate) AS `Expected Visit Date`,
+  DATE(a.WindowStart) AS `Window Start`,
+  DATE(a.WindowEnd) AS `Window End`
+--  DATE(a.AnchorDate) AS `Anchor Date Used`
+FROM
+(
+   --  1) Adrenal Recovery Assessment: 11–17 days after EC01 last dose - Applicable arms: 0011/0013/0015 - Missing-only
+  SELECT
+    x.Site,
+    x.Participant,
+    x.SubjID,
+    x.ArmCode,
+    x.Arm,
+    x.ETP_Discon,
+    x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Adrenal Recovery Assessment' AS ExpectedVisit,
+    x.LastDose_EC1 AS AnchorDate,
+    DATE_ADD(x.LastDose_EC1, INTERVAL 11 DAY) AS ExpectedVisitDate,
+    DATE_ADD(x.LastDose_EC1, INTERVAL 11 DAY) AS WindowStart,
+    DATE_ADD(x.LastDose_EC1, INTERVAL 17 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site,
+      b.Participant,
+      b.SubjID,
+      b.ETP_Discon,
+      b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM)
+       FROM TRIG
+       WHERE @Form.Status='submitted__v'
+         AND @HDR.Subject.ID = b.SubjID
+      ) AS ArmCode,
+
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`))
+       FROM TRIG
+       WHERE @Form.Status='submitted__v'
+         AND @HDR.Subject.ID = b.SubjID
+      ) AS Arm,
+
+    -- EC01 last dose date (stop preferred else start)
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm = 'EC01'
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        )
+       FROM vwECDose v
+       WHERE v.SubjID = b.SubjID
+      ) AS LastDose_EC1,
+
+      -- last dose across EC1-9 
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        )
+       FROM vwECDose v
+       WHERE v.SubjID = b.SubjID
+      ) AS LastDose_All,
+
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID = b.SubjID
+         AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+
+      (SELECT MAX(DSETP2_DSSTDAT)
+       FROM DSETP2
+       WHERE @Form.Status='submitted__v'
+         AND @HDR.Subject.ID = b.SubjID
+         AND (
+           DSETP2_DSTRLPRD_2 = 'ADRENAL RECOVERY FOLLOW-UP'
+           OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP')
+         )
+      ) AS ETP2_Discon
+
+    FROM
+    (
+      SELECT
+        @HDR.Site.Number  AS Site,
+        @HDR.Subject.Name AS Participant,
+        @HDR.Subject.ID   AS SubjID,
+        DSETP_DSSTDAT     AS ETP_Discon,
+        /* FIX: show actual stored value, not label() */
+        DSETP_O_DSNEXT    AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.ArmCode IN ('0011','0013','0015')
+    AND x.LastDose_EC1 IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD(x.LastDose_EC1, INTERVAL 11 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND @HDR.Event.Label = 'Adrenal Recovery Assessment'
+    )
+
+  UNION
+
+   --  Safety Follow-up: 30–37 days after last dose. if any Safety FU exists > no output
+  SELECT
+    x.Site,
+    x.Participant,
+    x.SubjID,
+    x.ArmCode,
+    x.Arm,
+    x.ETP_Discon,
+    x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Safety Follow-up' AS ExpectedVisit,
+    x.LastDose_All AS AnchorDate,
+    DATE_ADD(x.LastDose_All, INTERVAL 30 DAY) AS ExpectedVisitDate,
+    DATE_ADD(x.LastDose_All, INTERVAL 30 DAY) AS WindowStart,
+    DATE_ADD(x.LastDose_All, INTERVAL 37 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site, b.Participant, b.SubjID, b.ETP_Discon, b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS ArmCode,
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`)) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS Arm,
+
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        )
+       FROM vwECDose v
+       WHERE v.SubjID=b.SubjID
+      ) AS LastDose_All,
+
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID=b.SubjID AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+
+      (SELECT MAX(DSETP2_DSSTDAT) FROM DSETP2
+       WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID
+         AND (DSETP2_DSTRLPRD_2='ADRENAL RECOVERY FOLLOW-UP'
+              OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP'))
+      ) AS ETP2_Discon
+    FROM
+    (
+      SELECT @HDR.Site.Number AS Site, @HDR.Subject.Name AS Participant, @HDR.Subject.ID AS SubjID,
+             DSETP_DSSTDAT AS ETP_Discon,
+             DSETP_O_DSNEXT AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.LastDose_All IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD(x.LastDose_All, INTERVAL 30 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+    )
+
+  UNION
+
+  --  3) Week 4: 25–31 days after anchor (SafetyFU else ETP Discon)
+  SELECT
+    x.Site, x.Participant, x.SubjID, x.ArmCode, x.Arm, x.ETP_Discon, x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Adrenal Recovery Follow-up Week 4' AS ExpectedVisit,
+    (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) AS AnchorDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 25 DAY) AS ExpectedVisitDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 25 DAY) AS WindowStart,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 31 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site, b.Participant, b.SubjID, b.ETP_Discon, b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS ArmCode,
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`)) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS Arm,
+
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        )
+       FROM vwECDose v
+       WHERE v.SubjID=b.SubjID
+      ) AS LastDose_All,
+
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID=b.SubjID AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+
+      (SELECT MAX(DSETP2_DSSTDAT) FROM DSETP2
+       WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID
+         AND (DSETP2_DSTRLPRD_2='ADRENAL RECOVERY FOLLOW-UP'
+              OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP'))
+      ) AS ETP2_Discon
+    FROM
+    (
+      SELECT @HDR.Site.Number AS Site, @HDR.Subject.Name AS Participant, @HDR.Subject.ID AS SubjID,
+             DSETP_DSSTDAT AS ETP_Discon,
+             DSETP_O_DSNEXT AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.ArmCode IN ('0011','0013','0015')
+    AND (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 25 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND (
+          ( @HDR.Event.Label IN ('Adrenal Recovery Follow-up','Adrenal Recovery Follow-Up')
+            AND @HDR.EventGroup.RepeatLabel = 'Week 4'
+          )
+          OR @HDR.Event.Label IN ('Adrenal Recovery Follow-up Week 4','Adrenal Recovery Follow-Up Week 4')
+        )
+    )
+
+  UNION
+
+   --  Week 8: 53–59 days after anchor
+  SELECT
+    x.Site, x.Participant, x.SubjID, x.ArmCode, x.Arm, x.ETP_Discon, x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Adrenal Recovery Follow-up Week 8' AS ExpectedVisit,
+    (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) AS AnchorDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 53 DAY) AS ExpectedVisitDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 53 DAY) AS WindowStart,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 59 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site, b.Participant, b.SubjID, b.ETP_Discon, b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS ArmCode,
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`)) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS Arm,
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        ) FROM vwECDose v WHERE v.SubjID=b.SubjID
+      ) AS LastDose_All,
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID=b.SubjID AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+      (SELECT MAX(DSETP2_DSSTDAT) FROM DSETP2
+       WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID
+         AND (DSETP2_DSTRLPRD_2='ADRENAL RECOVERY FOLLOW-UP'
+              OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP'))
+      ) AS ETP2_Discon
+    FROM
+    (
+      SELECT @HDR.Site.Number AS Site, @HDR.Subject.Name AS Participant, @HDR.Subject.ID AS SubjID,
+             DSETP_DSSTDAT AS ETP_Discon,
+             DSETP_O_DSNEXT AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.ArmCode IN ('0011','0013','0015')
+    AND (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 53 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND (
+          ( @HDR.Event.Label IN ('Adrenal Recovery Follow-up','Adrenal Recovery Follow-Up')
+            AND @HDR.EventGroup.RepeatLabel = 'Week 8'
+          )
+          OR @HDR.Event.Label IN ('Adrenal Recovery Follow-up Week 8','Adrenal Recovery Follow-Up Week 8')
+        )
+    )
+
+  UNION
+
+     -- Week 16: 109–115 days
+  SELECT
+    x.Site, x.Participant, x.SubjID, x.ArmCode, x.Arm, x.ETP_Discon, x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Adrenal Recovery Follow-up Week 16' AS ExpectedVisit,
+    (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) AS AnchorDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 109 DAY) AS ExpectedVisitDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 109 DAY) AS WindowStart,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 115 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site, b.Participant, b.SubjID, b.ETP_Discon, b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS ArmCode,
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`)) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS Arm,
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        ) FROM vwECDose v WHERE v.SubjID=b.SubjID
+      ) AS LastDose_All,
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID=b.SubjID AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+      (SELECT MAX(DSETP2_DSSTDAT) FROM DSETP2
+       WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID
+         AND (DSETP2_DSTRLPRD_2='ADRENAL RECOVERY FOLLOW-UP'
+              OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP'))
+      ) AS ETP2_Discon
+    FROM
+    (
+      SELECT @HDR.Site.Number AS Site, @HDR.Subject.Name AS Participant, @HDR.Subject.ID AS SubjID,
+             DSETP_DSSTDAT AS ETP_Discon,
+             DSETP_O_DSNEXT AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.ArmCode IN ('0011','0013','0015')
+    AND (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 109 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND (
+          ( @HDR.Event.Label IN ('Adrenal Recovery Follow-up','Adrenal Recovery Follow-Up')
+            AND @HDR.EventGroup.RepeatLabel = 'Week 16'
+          )
+          OR @HDR.Event.Label IN ('Adrenal Recovery Follow-up Week 16','Adrenal Recovery Follow-Up Week 16')
+        )
+    )
+
+  UNION
+
+
+     -- Week 24: 165–171 days
+  SELECT
+    x.Site, x.Participant, x.SubjID, x.ArmCode, x.Arm, x.ETP_Discon, x.NextTrialPeriod,
+    x.LastDose_All AS LastDoseDate,
+    x.SafetyDOV    AS SafetyFUDate,
+    'Adrenal Recovery Follow-up Week 24' AS ExpectedVisit,
+    (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) AS AnchorDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 165 DAY) AS ExpectedVisitDate,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 165 DAY) AS WindowStart,
+    DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 171 DAY) AS WindowEnd
+  FROM
+  (
+    SELECT
+      b.Site, b.Participant, b.SubjID, b.ETP_Discon, b.NextTrialPeriod,
+      (SELECT MAX(TRIG_O_SCARM) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS ArmCode,
+      (SELECT MAX(codelabel(`TRIG`.`ig_TRIG.TRIG_O_SCARM`)) FROM TRIG WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID) AS Arm,
+      (SELECT MAX(
+          CASE
+            WHEN v.FrmNm IN ('EC01','EC04','EC05','EC06','EC07','EC08','EC09')
+             AND v.EC_ECLDINDC IS NOT NULL AND v.EC_ECLDINDC <> 0
+            THEN COALESCE(v.EC_ECENDTTM, v.EC_ECSTDTTM)
+            ELSE NULL
+          END
+        ) FROM vwECDose v WHERE v.SubjID=b.SubjID
+      ) AS LastDose_All,
+      (SELECT MIN(@HDR.Event.Date)
+       WHERE @HDR.Subject.ID=b.SubjID AND @HDR.Event.Date IS NOT NULL
+         AND @HDR.Event.Label IN ('Safety Follow-up','Safety Follow-Up')
+      ) AS SafetyDOV,
+      (SELECT MAX(DSETP2_DSSTDAT) FROM DSETP2
+       WHERE @Form.Status='submitted__v' AND @HDR.Subject.ID=b.SubjID
+         AND (DSETP2_DSTRLPRD_2='ADRENAL RECOVERY FOLLOW-UP'
+              OR label(DSETP2_DSTRLPRD_2) IN ('Adrenal Recovery Follow-up','ADRENAL RECOVERY FOLLOW-UP'))
+      ) AS ETP2_Discon
+    FROM
+    (
+      SELECT @HDR.Site.Number AS Site, @HDR.Subject.Name AS Participant, @HDR.Subject.ID AS SubjID,
+             DSETP_DSSTDAT AS ETP_Discon,
+             DSETP_O_DSNEXT AS NextTrialPeriod
+      FROM DSETP
+      WHERE @Form.Status='submitted__v'
+        AND DSETP_O_DSNEXT='ADRENAL RECOVERY ASSESSMENT/EFFICACY FOLLOW-UP'
+    ) b
+  ) x
+  WHERE x.ArmCode IN ('0011','0013','0015')
+    AND (CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END) IS NOT NULL
+    AND (x.ETP2_Discon IS NULL OR DATE_ADD((CASE WHEN x.SafetyDOV IS NULL THEN x.ETP_Discon ELSE x.SafetyDOV END), INTERVAL 165 DAY) <= x.ETP2_Discon)
+    AND NOT EXISTS
+    (
+      SELECT 1
+      WHERE @HDR.Subject.ID = x.SubjID
+        AND @HDR.Event.Date IS NOT NULL
+        AND (
+          ( @HDR.Event.Label IN ('Adrenal Recovery Follow-up','Adrenal Recovery Follow-Up')
+            AND @HDR.EventGroup.RepeatLabel = 'Week 24'
+          )
+          OR @HDR.Event.Label IN ('Adrenal Recovery Follow-up Week 24','Adrenal Recovery Follow-Up Week 24')
+        )
+    )
+
+) a
+ORDER BY a.Site, a.Participant, a.ExpectedVisit, a.ExpectedVisitDate
