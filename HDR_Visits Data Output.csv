@@ -1,0 +1,84 @@
+Study.Name,Site,Participant,Subject.Status,SubjID,EventGroup,EventName,EventDate,Event.Status,Event.VisitMethod,LABEL,Event.Label
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_ADRENALASSESSMENT,ev_ADRENALASSESSMENT,,planned__v,,Adrenal Recovery Assessment,Adrenal Recovery Assessment
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_EOT,ev_EOT,2025-12-30,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_INTERVENTIONA,ev_DAY_1A,,planned__v,,Intervention - Cohort A : Breast Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_SAFETYFUP,ev_SAFETYFUP,,planned__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040253,in_screening__v,OPP00000005G117,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_ADRENALASSESSMENT,ev_ADRENALASSESSMENT,,planned__v,,Adrenal Recovery Assessment,Adrenal Recovery Assessment
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_EOT,ev_EOT,2025-12-30,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_INTERVENTIONB,ev_DAY_1B,,planned__v,,Intervention - Cohort B : Ovarian Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_SAFETYFUP,ev_SAFETYFUP,,planned__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040254,in_screening__v,OPP00000005F110,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_ADRENALASSESSMENT,ev_ADRENALASSESSMENT,,planned__v,,Adrenal Recovery Assessment,Adrenal Recovery Assessment
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_EOT,ev_EOT,2025-12-30,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_INTERVENTIONC,ev_DAY_1C,,planned__v,,Intervention - Cohort C : Endometrial Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_SAFETYFUP,ev_SAFETYFUP,,planned__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040255,in_screening__v,OPP00000005F111,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_ADRENALASSESSMENT,ev_ADRENALASSESSMENT,,planned__v,,Adrenal Recovery Assessment,Adrenal Recovery Assessment
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_COMMON,ev_COMMON,,blank__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_INTERVENTIONB,ev_DAY_1B,,planned__v,,Intervention - Cohort B : Ovarian Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_SAFETYFUP,ev_SAFETYFUP,2025-11-01,blank__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040259,in_screening__v,OPP00000005F114,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_ADRENALASSESSMENT,ev_ADRENALASSESSMENT,,planned__v,,Adrenal Recovery Assessment,Adrenal Recovery Assessment
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_ADRENALFUP,ev_ADRENALFUP,2025-06-28,blank__v,,Adrenal Follow-up (1),Adrenal Recovery Follow-up
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_ADRENALFUP,ev_ADRENALFUP,2025-07-28,blank__v,,Adrenal Follow-up (2),Adrenal Recovery Follow-up
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_ADRENALFUP,ev_ADRENALFUP,2025-09-18,blank__v,,Adrenal Follow-up (3),Adrenal Recovery Follow-up
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_COMMON,ev_COMMON,,blank__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_EOT,ev_EOT,2025-06-01,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_INTERVENTIONA,ev_DAY_1A,,planned__v,,Intervention - Cohort A : Breast Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_SAFETYFUP,ev_SAFETYFUP,,planned__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040261,in_screening__v,OPP00000005G120,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_INTERVENTIONA,ev_DAY_1A,,planned__v,,Intervention - Cohort A : Breast Cancer Cycle (1),Day 1
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_RAND,ev_RAND,2025-12-04,in_progress__v,,Randomization,Randomization
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_SAFETYFUP,ev_SAFETYFUP,2026-01-02,blank__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040265,in_screening__v,OPP00000005G123,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,eg_EFFICACYFUP,ev_EFFICACYFUP,,planned__v,,Efficacy Follow-up (1),Efficacy Follow-up
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,eg_RAND,ev_RAND,2025-12-04,blank__v,,Randomization,Randomization
+5684-015_TST1,0004,00040267,in_screening__v,OPP00000005G126,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,eg_RAND,ev_RAND,2025-12-04,blank__v,,Randomization,Randomization
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,eg_SAFETYFUP,ev_SAFETYFUP,2026-01-11,blank__v,,Safety Follow-up,Safety Follow-up
+5684-015_TST1,0004,00040269,in_screening__v,OPP00000005G127,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040270,in_screening__v,OPP00000005F120,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040270,in_screening__v,OPP00000005F120,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040270,in_screening__v,OPP00000005F120,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040270,in_screening__v,OPP00000005F120,eg_RAND,ev_RAND,2025-12-04,blank__v,,Randomization,Randomization
+5684-015_TST1,0004,00040270,in_screening__v,OPP00000005F120,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040271,in_screening__v,OPP00000005G128,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040271,in_screening__v,OPP00000005G128,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040271,in_screening__v,OPP00000005G128,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040271,in_screening__v,OPP00000005G128,eg_RAND,ev_RAND,2025-12-04,blank__v,,Randomization,Randomization
+5684-015_TST1,0004,00040271,in_screening__v,OPP00000005G128,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
+5684-015_TST1,0004,00040272,in_screening__v,OPP00000005F121,SDE_default_egd,SUB,,submitted__v,,,
+5684-015_TST1,0004,00040272,in_screening__v,OPP00000005F121,eg_COMMON,ev_COMMON,,in_progress__v,,Common Forms,Common Forms
+5684-015_TST1,0004,00040272,in_screening__v,OPP00000005F121,eg_EOT,ev_EOT,2025-10-24,in_progress__v,,End of Treatment,End of Treatment
+5684-015_TST1,0004,00040272,in_screening__v,OPP00000005F121,eg_RAND,ev_RAND,2025-12-04,blank__v,,Randomization,Randomization
+5684-015_TST1,0004,00040272,in_screening__v,OPP00000005F121,eg_SCREENING,ev_SCREENING,2025-12-01,blank__v,,Screening,Screening
