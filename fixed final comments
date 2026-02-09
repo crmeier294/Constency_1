@@ -1,0 +1,15 @@
+“Only fire when Window End is in the past”
+
+Your new output has 552 records (down from 805).
+
+The latest Window End in the output is 2026-02-08, so it’s no longer outputting future windows (consistent with your WHERE DATE(a.WindowEnd) < DATE(NOW()) logic).
+
+ 2) 00040270 / 00040271 / 00040272 now show the expected Safety Follow-up
+
+These now appear and they only have Safety Follow-up (as expected for Survival Follow-up in your request):
+
+00040270 → Safety Follow-up (Window End 2026-01-11)
+
+00040271 → Safety Follow-up (Window End 2025-12-22)
+
+00040272 → Safety Follow-up (Window End 2026-01-07)
